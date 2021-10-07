@@ -1,0 +1,23 @@
+provider "aws" {
+  region = "ap-south-1"
+
+}
+
+resource "aws_s3_bucket" "mybucket" {
+  bucket = "my-tf-test-bucket-jsmsth30"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
+
+#this can be used to copy file with .py and .html format
+resource "aws_s3_bucket_object" "test" {
+  for_each = fileset(path.module, "**/*{.py,.html}")
+  bucket   = aws_s3_bucket.mybucket.id
+  key      = each.value
+  source   = "${path.module}/${each.value}"
+
+}
